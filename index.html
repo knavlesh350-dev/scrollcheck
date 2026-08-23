@@ -19,6 +19,7 @@
             justify-content: center;
             align-items: center;
             color: #333;
+            padding: 20px;
         }
 
         .container {
@@ -28,7 +29,7 @@
             text-align: center;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             max-width: 500px;
-            width: 90%;
+            width: 100%;
         }
 
         h1 {
@@ -69,6 +70,185 @@
             transform: translateY(-1px);
         }
 
+        /* Tracking Screen */
+        .tracking-screen {
+            display: none;
+        }
+
+        .tracking-screen.active {
+            display: block;
+        }
+
+        .welcome-screen {
+            display: block;
+        }
+
+        .welcome-screen.hidden {
+            display: none;
+        }
+
+        .input-group {
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 1em;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            margin: 0;
+        }
+
+        .unit {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .btn-analyze {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        .btn-analyze:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .section-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .btn-back {
+            background: #999;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.9em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .btn-back:hover {
+            background: #777;
+        }
+
+        /* Analysis Screen */
+        .analysis-screen {
+            display: none;
+        }
+
+        .analysis-screen.active {
+            display: block;
+        }
+
+        .score-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .score {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .score-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .breakdown {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .breakdown-value {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .total-row {
+            background: #f0f0f0;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+
+        .message {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: left;
+            color: #333;
+        }
+
         /* Responsive Design */
         @media (max-width: 600px) {
             .container {
@@ -82,20 +262,188 @@
             .tagline {
                 font-size: 1em;
             }
+
+            .score {
+                font-size: 2em;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Welcome Screen -->
+    <div class="container welcome-screen" id="welcomeScreen">
         <h1>SCROLLCHECK</h1>
         <p class="tagline">Take control of your scroll.</p>
-        <button class="btn-start" onclick="startTracking()">[ Start Tracking ]</button>
+        <button class="btn-start" onclick="goToTracking()">[ Start Tracking ]</button>
+    </div>
+
+    <!-- Tracking Screen -->
+    <div class="container tracking-screen" id="trackingScreen">
+        <h1>SCROLLCHECK</h1>
+        <p class="tagline">Today's activity</p>
+
+        <div class="input-group">
+            <label>Short videos watched</label>
+            <div class="input-wrapper">
+                <input type="number" id="videosWatched" value="0" min="0">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Total scrolling time</label>
+            <div class="input-wrapper">
+                <input type="number" id="totalTime" value="0" min="0">
+                <span class="unit">minutes</span>
+            </div>
+        </div>
+
+        <div class="section-title">📚 Educational</div>
+        <div class="input-group">
+            <div class="input-wrapper">
+                <input type="number" id="educational" value="0" min="0">
+                <span class="unit">minutes</span>
+            </div>
+        </div>
+
+        <div class="section-title">🛠️ Skill / Useful</div>
+        <div class="input-group">
+            <div class="input-wrapper">
+                <input type="number" id="useful" value="0" min="0">
+                <span class="unit">minutes</span>
+            </div>
+        </div>
+
+        <div class="section-title">🎭 Entertainment</div>
+        <div class="input-group">
+            <div class="input-wrapper">
+                <input type="number" id="entertainment" value="0" min="0">
+                <span class="unit">minutes</span>
+            </div>
+        </div>
+
+        <div class="section-title">🔍 Unclassified</div>
+        <div class="input-group">
+            <div class="input-wrapper">
+                <input type="number" id="unclassified" value="0" min="0">
+                <span class="unit">minutes</span>
+            </div>
+        </div>
+
+        <div class="section-title">🌙 Late-night scrolling</div>
+        <div class="input-group">
+            <div class="input-wrapper">
+                <input type="number" id="lateNight" value="0" min="0">
+                <span class="unit">minutes</span>
+            </div>
+        </div>
+
+        <button class="btn-analyze" onclick="analyzeData()">[ ANALYZE ]</button>
+        <button class="btn-back" onclick="goToWelcome()">← Back</button>
+    </div>
+
+    <!-- Analysis Screen -->
+    <div class="container analysis-screen" id="analysisScreen">
+        <h1>Your Scroll Balance</h1>
+
+        <div class="score-section">
+            <div class="score" id="scoreValue">72 / 100</div>
+            <div class="score-label" id="scoreStatus">🟡 Good Balance</div>
+        </div>
+
+        <div class="section-title">Your usage today</div>
+        <div class="breakdown">
+            <div class="breakdown-item">
+                <span class="breakdown-label">📚 Learning</span>
+                <span class="breakdown-value" id="educationalDisplay">25 min</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="breakdown-label">🛠️ Useful</span>
+                <span class="breakdown-value" id="usefulDisplay">10 min</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="breakdown-label">🎭 Entertainment</span>
+                <span class="breakdown-value" id="entertainmentDisplay">35 min</span>
+            </div>
+            <div class="breakdown-item">
+                <span class="breakdown-label">🔍 Unclassified</span>
+                <span class="breakdown-value" id="unclassifiedDisplay">4 min</span>
+            </div>
+            <div class="total-row">
+                <span>⏱️ Total</span>
+                <span id="totalDisplay">74 min</span>
+            </div>
+        </div>
+
+        <div class="message" id="feedbackMessage">
+            <p id="feedbackText">47% of your scrolling was educational or useful.</p>
+        </div>
+
+        <button class="btn-analyze" onclick="goToTracking()">[ Track Again ]</button>
+        <button class="btn-back" onclick="goToWelcome()">← Back to Home</button>
     </div>
 
     <script>
-        function startTracking() {
-            alert('Welcome to ScrollCheck! Tracking feature coming soon.');
-            console.log('Start Tracking button clicked');
+        function goToTracking() {
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('trackingScreen').classList.add('active');
+            document.getElementById('analysisScreen').classList.remove('active');
+        }
+
+        function goToWelcome() {
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            document.getElementById('trackingScreen').classList.remove('active');
+            document.getElementById('analysisScreen').classList.remove('active');
+        }
+
+        function analyzeData() {
+            const educational = parseInt(document.getElementById('educational').value) || 0;
+            const useful = parseInt(document.getElementById('useful').value) || 0;
+            const entertainment = parseInt(document.getElementById('entertainment').value) || 0;
+            const unclassified = parseInt(document.getElementById('unclassified').value) || 0;
+            const lateNight = parseInt(document.getElementById('lateNight').value) || 0;
+            const totalTime = parseInt(document.getElementById('totalTime').value) || 0;
+
+            // Calculate productive vs entertainment ratio
+            const productive = educational + useful;
+            const totalCategorized = educational + useful + entertainment + unclassified;
+
+            let score = 50;
+            let status = '🔴 Needs Work';
+            let feedback = '';
+
+            if (totalCategorized > 0) {
+                const productivePercentage = (productive / totalCategorized) * 100;
+                score = Math.round(productivePercentage * 0.8 + 20);
+
+                if (productivePercentage >= 60) {
+                    status = '🟢 Excellent!';
+                    feedback = `🎉 ${Math.round(productivePercentage)}% of your scrolling was educational or useful. Great job maintaining focus!`;
+                } else if (productivePercentage >= 40) {
+                    status = '🟡 Good Balance';
+                    feedback = `${Math.round(productivePercentage)}% of your scrolling was educational or useful. This is much better than simply scrolling!`;
+                } else {
+                    status = '🔴 Needs Work';
+                    feedback = `🎭 Entertainment scrolling is taking up most of your short-video time. Try a 5-minute reset before your next session.`;
+                }
+
+                if (lateNight > 20) {
+                    feedback += ` <br><br>🌙 You spent ${lateNight} minutes scrolling late at night. Consider setting a No-Scroll period before bedtime.`;
+                }
+            }
+
+            // Update Analysis Screen
+            document.getElementById('scoreValue').textContent = `${score} / 100`;
+            document.getElementById('scoreStatus').textContent = status;
+            document.getElementById('educationalDisplay').textContent = `${educational} min`;
+            document.getElementById('usefulDisplay').textContent = `${useful} min`;
+            document.getElementById('entertainmentDisplay').textContent = `${entertainment} min`;
+            document.getElementById('unclassifiedDisplay').textContent = `${unclassified} min`;
+            document.getElementById('totalDisplay').textContent = `${totalTime} min`;
+            document.getElementById('feedbackText').innerHTML = feedback;
+
+            // Switch to Analysis Screen
+            document.getElementById('trackingScreen').classList.remove('active');
+            document.getElementById('analysisScreen').classList.add('active');
         }
     </script>
 </body>
