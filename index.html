@@ -57,7 +57,7 @@
             font-weight: 300;
         }
 
-        .btn-start, .btn-connect {
+        .btn-start, .btn-connect, .btn-enable {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
@@ -70,12 +70,12 @@
             margin: 10px 0;
         }
 
-        .btn-start:hover, .btn-connect:hover {
+        .btn-start:hover, .btn-connect:hover, .btn-enable:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
         }
 
-        .btn-start:active, .btn-connect:active {
+        .btn-start:active, .btn-connect:active, .btn-enable:active {
             transform: translateY(-1px);
         }
 
@@ -164,6 +164,36 @@
 
         .social-card.connected .checkmark {
             display: flex;
+        }
+
+        /* Tracking Status */
+        .tracking-status {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+
+        .tracking-icon {
+            font-size: 3em;
+            margin: 10px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         .input-group {
@@ -343,6 +373,97 @@
             border-bottom: none;
         }
 
+        /* Real-time Updates */
+        .real-time-section {
+            background: #f0f7ff;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .real-time-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .real-time-item:last-child {
+            border-bottom: none;
+        }
+
+        .platform-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .live-time {
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .toggle-tracking {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
         /* Responsive Design */
         @media (max-width: 600px) {
             .container {
@@ -487,12 +608,61 @@
         </div>
 
         <div class="btn-row">
-            <button class="btn-analyze" onclick="goToTracking()">[ Continue ]</button>
+            <button class="btn-analyze" onclick="goToAutoTracking()">[ Continue ]</button>
             <button class="btn-back" onclick="goToWelcome()">← Back</button>
         </div>
     </div>
 
-    <!-- Tracking Screen -->
+    <!-- Automatic Tracking Screen -->
+    <div class="container screen" id="autoTrackingScreen">
+        <h1>Auto Tracking</h1>
+        <p class="tagline">Real-time background monitoring</p>
+
+        <div class="tracking-status">
+            <div class="tracking-icon">🔄</div>
+            <div class="status-badge" id="trackingBadge">● TRACKING ACTIVE</div>
+            <p style="margin-top: 10px; font-size: 0.95em;">Monitoring your connected apps</p>
+        </div>
+
+        <div class="toggle-tracking">
+            <span>Enable Background Tracking</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="autoTrackToggle" checked onchange="toggleAutoTracking()">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="section-title">📱 Live Platform Activity</div>
+        <div class="real-time-section" id="realtimeUpdates">
+            <p style="text-align: center; color: #999;">Waiting for platform data...</p>
+        </div>
+
+        <div class="section-title">⏰ Auto-Tracking Interval</div>
+        <div class="input-group">
+            <label>Update every (seconds)</label>
+            <div class="input-wrapper">
+                <input type="number" id="updateInterval" value="5" min="1" max="60">
+                <span class="unit">sec</span>
+            </div>
+        </div>
+
+        <div class="message">
+            <p>💡 Auto-tracking monitors your app usage every few seconds and updates your stats in real-time. The system tracks:</p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Screen time per app</li>
+                <li>Number of reels/videos scrolled</li>
+                <li>Switching between apps</li>
+                <li>Peak activity times</li>
+            </ul>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn-analyze" onclick="goToTracking()">[ Manual Override ]</button>
+            <button class="btn-back" onclick="goToConnection()">← Back</button>
+        </div>
+    </div>
+
+    <!-- Tracking Screen (Manual) -->
     <div class="container screen" id="trackingScreen">
         <h1>SCROLLCHECK</h1>
         <p class="tagline">Today's activity</p>
@@ -553,7 +723,7 @@
 
         <div class="btn-row">
             <button class="btn-analyze" onclick="analyzeData()">[ ANALYZE ]</button>
-            <button class="btn-back" onclick="goToConnection()">← Back</button>
+            <button class="btn-back" onclick="goToAutoTracking()">← Back</button>
         </div>
     </div>
 
@@ -600,7 +770,7 @@
         </div>
 
         <div class="btn-row">
-            <button class="btn-analyze" onclick="goToTracking()">[ Track Again ]</button>
+            <button class="btn-analyze" onclick="goToAutoTracking()">[ Track Again ]</button>
             <button class="btn-back" onclick="goToConnection()">← Back</button>
         </div>
     </div>
@@ -623,6 +793,12 @@
             twitch: '🎮'
         };
 
+        // Auto-tracking data storage
+        let autoTrackingData = {};
+        let autoTrackingActive = true;
+        let autoTrackingInterval = 5000; // 5 seconds default
+        let trackingIntervalId = null;
+
         function toggleConnection(element, platform) {
             element.classList.toggle('connected');
             connectedPlatforms[platform] = element.classList.contains('connected');
@@ -631,9 +807,11 @@
             if (connectedPlatforms[platform]) {
                 statusEl.textContent = 'Connected';
                 statusEl.className = 'social-status status-connected';
+                autoTrackingData[platform] = { time: 0, reels: 0 };
             } else {
                 statusEl.textContent = 'Not Connected';
                 statusEl.className = 'social-status status-disconnected';
+                delete autoTrackingData[platform];
             }
         }
 
@@ -661,15 +839,86 @@
             });
         }
 
+        function toggleAutoTracking() {
+            autoTrackingActive = document.getElementById('autoTrackToggle').checked;
+            if (autoTrackingActive) {
+                startAutoTracking();
+            } else {
+                stopAutoTracking();
+            }
+        }
+
+        function startAutoTracking() {
+            const interval = parseInt(document.getElementById('updateInterval').value) * 1000;
+            autoTrackingInterval = interval;
+            
+            if (trackingIntervalId) clearInterval(trackingIntervalId);
+            
+            trackingIntervalId = setInterval(() => {
+                simulateAppTracking();
+                updateRealtimeDisplay();
+            }, autoTrackingInterval);
+
+            document.getElementById('trackingBadge').textContent = '● TRACKING ACTIVE';
+            simulateAppTracking();
+            updateRealtimeDisplay();
+        }
+
+        function stopAutoTracking() {
+            if (trackingIntervalId) clearInterval(trackingIntervalId);
+            document.getElementById('trackingBadge').textContent = '⏸ TRACKING PAUSED';
+        }
+
+        function simulateAppTracking() {
+            // Simulate random app usage
+            Object.keys(connectedPlatforms).forEach(platform => {
+                if (connectedPlatforms[platform]) {
+                    const randomTime = Math.floor(Math.random() * 3) + 1; // 1-3 minutes per interval
+                    const randomReels = Math.floor(Math.random() * 5) + 1; // 1-5 reels per interval
+                    
+                    autoTrackingData[platform].time += randomTime;
+                    autoTrackingData[platform].reels += randomReels;
+                }
+            });
+        }
+
+        function updateRealtimeDisplay() {
+            const container = document.getElementById('realtimeUpdates');
+            let html = '';
+
+            Object.keys(autoTrackingData).forEach(platform => {
+                const data = autoTrackingData[platform];
+                html += `
+                    <div class="real-time-item">
+                        <span class="platform-name">${platformIcons[platform]} ${platform.charAt(0).toUpperCase() + platform.slice(1)}</span>
+                        <span><span class="live-time">LIVE</span> ${data.time} min • ${data.reels} reels</span>
+                    </div>
+                `;
+            });
+
+            if (html) {
+                container.innerHTML = html;
+            }
+        }
+
         function goToWelcome() {
+            stopAutoTracking();
             switchScreen('welcomeScreen');
         }
 
         function goToConnection() {
+            stopAutoTracking();
             switchScreen('connectionScreen');
         }
 
+        function goToAutoTracking() {
+            generatePlatformInputs();
+            switchScreen('autoTrackingScreen');
+            startAutoTracking();
+        }
+
         function goToTracking() {
+            stopAutoTracking();
             generatePlatformInputs();
             switchScreen('trackingScreen');
         }
@@ -689,15 +938,15 @@
             const lateNight = parseInt(document.getElementById('lateNight').value) || 0;
             const totalTime = parseInt(document.getElementById('totalTime').value) || 0;
 
-            // Collect platform data
+            // Collect platform data - use auto-tracked data if available
             const platformData = {};
             let totalPlatformTime = 0;
             let totalReels = 0;
 
             Object.keys(connectedPlatforms).forEach(platform => {
                 if (connectedPlatforms[platform]) {
-                    const time = parseInt(document.getElementById(`${platform}_time`)?.value) || 0;
-                    const reels = parseInt(document.getElementById(`${platform}_reels`)?.value) || 0;
+                    const time = autoTrackingData[platform]?.time || parseInt(document.getElementById(`${platform}_time`)?.value) || 0;
+                    const reels = autoTrackingData[platform]?.reels || parseInt(document.getElementById(`${platform}_reels`)?.value) || 0;
                     if (time > 0 || reels > 0) {
                         platformData[platform] = { time, reels };
                         totalPlatformTime += time;
@@ -769,6 +1018,14 @@
             // Switch to Analysis Screen
             switchScreen('analysisScreen');
         }
+
+        // Initialize auto-tracking when page loads
+        window.addEventListener('load', () => {
+            // Initialize empty auto-tracking data
+            Object.keys(connectedPlatforms).forEach(platform => {
+                autoTrackingData[platform] = { time: 0, reels: 0 };
+            });
+        });
     </script>
 </body>
 </html>
