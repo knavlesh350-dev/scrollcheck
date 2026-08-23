@@ -3,1110 +3,720 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScrollCheck - Take Control of Your Scroll</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #333;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 60px 40px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        h1 {
-            font-size: 3em;
-            font-weight: bold;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        h2 {
-            font-size: 1.5em;
-            color: #333;
-            margin: 20px 0;
-        }
-
-        .tagline {
-            font-size: 1.2em;
-            color: #666;
-            margin-bottom: 40px;
-            font-weight: 300;
-        }
-
-        .btn-start, .btn-connect, .btn-enable {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.1em;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-            margin: 10px 0;
-        }
-
-        .btn-start:hover, .btn-connect:hover, .btn-enable:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
-        }
-
-        .btn-start:active, .btn-connect:active, .btn-enable:active {
-            transform: translateY(-1px);
-        }
-
-        /* Screen Management */
-        .screen {
-            display: none;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        /* Social Media Connection Grid */
-        .social-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 30px 0;
-        }
-
-        .social-card {
-            background: #f5f5f5;
-            border: 2px solid #ddd;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .social-card:hover {
-            border-color: #667eea;
-            background: #f0f0ff;
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .social-icon {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .social-name {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .social-status {
-            font-size: 0.85em;
-            color: #999;
-        }
-
-        .status-connected {
-            color: #4caf50;
-            font-weight: bold;
-        }
-
-        .status-pending {
-            color: #ff9800;
-            font-weight: bold;
-        }
-
-        .status-disconnected {
-            color: #f44336;
-            font-weight: bold;
-        }
-
-        .checkmark {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #4caf50;
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            display: none;
-        }
-
-        .social-card.connected .checkmark {
-            display: flex;
-        }
-
-        /* Mobile Integration Section */
-        .mobile-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin: 30px 0;
-            text-align: center;
-        }
-
-        .mobile-icon {
-            font-size: 3em;
-            margin: 10px 0;
-        }
-
-        .mobile-status {
-            font-size: 1.1em;
-            margin: 15px 0;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-        }
-
-        .connection-method {
-            background: #f5f5f5;
-            border: 2px solid #ddd;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 15px 0;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .connection-method:hover {
-            border-color: #667eea;
-            background: #f0f0ff;
-            transform: translateY(-3px);
-        }
-
-        .connection-method.active {
-            border-color: #667eea;
-            background: #e8e8ff;
-        }
-
-        .method-title {
-            font-weight: 600;
-            color: #333;
-            font-size: 1.1em;
-            margin-bottom: 8px;
-        }
-
-        .method-desc {
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        .connection-code {
-            background: #f0f0f0;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            font-family: monospace;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #667eea;
-            text-align: center;
-        }
-
-        .qr-code {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 15px 0;
-            text-align: center;
-        }
-
-        .qr-placeholder {
-            width: 200px;
-            height: 200px;
-            background: #ddd;
-            margin: 0 auto;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
-        }
-
-        /* Tracking Status */
-        .tracking-status {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .status-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
-            margin: 10px 0;
-            font-weight: 600;
-        }
-
-        .tracking-icon {
-            font-size: 3em;
-            margin: 10px 0;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .input-group {
-            margin: 20px 0;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 1em;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            font-size: 1em;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            transition: border-color 0.3s;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .input-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .input-wrapper input {
-            flex: 1;
-            margin: 0;
-        }
-
-        .unit {
-            font-size: 0.9em;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .section-title {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #333;
-            margin-top: 25px;
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        .btn-analyze, .btn-back {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.1em;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-            margin-top: 30px;
-            margin-right: 10px;
-            width: calc(50% - 5px);
-        }
-
-        .btn-back {
-            background: #999;
-            width: calc(50% - 5px);
-        }
-
-        .btn-back:hover {
-            background: #777;
-        }
-
-        .btn-analyze:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
-        }
-
-        .btn-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-row button {
-            flex: 1;
-        }
-
-        .score-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-        }
-
-        .score {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .score-label {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .breakdown {
-            text-align: left;
-            margin: 20px 0;
-        }
-
-        .breakdown-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .breakdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .breakdown-label {
-            font-weight: 500;
-            color: #333;
-        }
-
-        .breakdown-value {
-            color: #667eea;
-            font-weight: bold;
-        }
-
-        .total-row {
-            background: #f0f0f0;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-        }
-
-        .message {
-            background: #f8f9fa;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-            text-align: left;
-            color: #333;
-        }
-
-        .platform-stats {
-            text-align: left;
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-        }
-
-        .platform-stat-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .platform-stat-item:last-child {
-            border-bottom: none;
-        }
-
-        .real-time-section {
-            background: #f0f7ff;
-            border: 2px solid #667eea;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: left;
-        }
-
-        .real-time-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .real-time-item:last-child {
-            border-bottom: none;
-        }
-
-        .platform-name {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .live-time {
-            background: #ff6b6b;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: bold;
-        }
-
-        .toggle-tracking {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: #f5f5f5;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 26px;
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .toggle-slider {
-            background-color: #667eea;
-        }
-
-        input:checked + .toggle-slider:before {
-            transform: translateX(24px);
-        }
-
-        .device-connected {
-            background: #c8e6c9;
-            border: 2px solid #4caf50;
-            color: #2e7d32;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            font-weight: 600;
-        }
-
-        .device-connecting {
-            background: #fff9c4;
-            border: 2px solid #fbc02d;
-            color: #f57f17;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            font-weight: 600;
-        }
-
-        .device-error {
-            background: #ffcdd2;
-            border: 2px solid #f44336;
-            color: #c62828;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            font-weight: 600;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 600px) {
-            .container {
-                padding: 40px 20px;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-
-            .tagline {
-                font-size: 1em;
-            }
-
-            .score {
-                font-size: 2em;
-            }
-
-            .social-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .btn-row {
-                flex-direction: column;
-            }
-
-            .btn-row button {
-                width: 100%;
-            }
-        }
-    </style>
+    <title>ScrollCheck - Understand Your Scrolling</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Welcome Screen -->
-    <div class="container screen active" id="welcomeScreen">
-        <h1>SCROLLCHECK</h1>
-        <p class="tagline">Take control of your scroll.</p>
-        <button class="btn-start" onclick="goToMobileIntegration()">[ Start Tracking ]</button>
-    </div>
-
-    <!-- Mobile Integration Screen -->
-    <div class="container screen" id="mobileIntegrationScreen">
-        <h1>Connect Your Device</h1>
-        <p class="tagline">Direct phone integration for accurate tracking</p>
-
-        <div class="mobile-section">
-            <div class="mobile-icon">📱</div>
-            <div class="mobile-status" id="deviceStatus">Ready to connect</div>
-            <p>Connect your phone to get real screen time data</p>
+    <!-- Navigation Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>📱 ScrollCheck</h2>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">✕</button>
         </div>
-
-        <div class="section-title">Choose Connection Method</div>
-
-        <!-- WiFi Direct Method -->
-        <div class="connection-method" onclick="selectConnectionMethod(this, 'wifi')">
-            <div class="method-title">🌐 WiFi Direct</div>
-            <div class="method-desc">Connect via WiFi on the same network (Recommended)</div>
+        <ul class="nav-menu">
+            <li><a href="#" onclick="showPage('welcome')">🏠 Home</a></li>
+            <li><a href="#" onclick="showPage('dashboard')">📊 Dashboard</a></li>
+            <li><a href="#" onclick="showPage('daily-input')">📝 Log Activity</a></li>
+            <li><a href="#" onclick="showPage('analysis')">📈 Analysis</a></li>
+            <li><a href="#" onclick="showPage('weekly')">📅 Weekly Report</a></li>
+            <li><a href="#" onclick="showPage('challenges')">🎯 Daily Challenges</a></li>
+            <li><a href="#" onclick="showPage('rewards')">🏆 Rewards</a></li>
+            <li><a href="#" onclick="showPage('streak')">🔥 Streak</a></li>
+            <li><a href="#" onclick="showPage('break-timer')">⏱️ 5-Min Reset</a></li>
+            <li><a href="#" onclick="showPage('future')">🚀 Coming Soon</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="btn-demo" onclick="loadDemoData()">Demo Data</button>
+            <button class="btn-reset" onclick="resetToday()">Reset Today</button>
         </div>
+    </nav>
 
-        <!-- QR Code Method -->
-        <div class="connection-method" onclick="selectConnectionMethod(this, 'qr')">
-            <div class="method-title">📷 QR Code</div>
-            <div class="method-desc">Scan QR code with your phone</div>
-        </div>
+    <!-- Mobile Toggle Button -->
+    <button class="mobile-menu-toggle" onclick="toggleSidebar()">☰</button>
 
-        <!-- USB Cable Method -->
-        <div class="connection-method" onclick="selectConnectionMethod(this, 'usb')">
-            <div class="method-title">🔌 USB Cable</div>
-            <div class="method-desc">Connect directly via USB for stable connection</div>
-        </div>
-
-        <!-- Bluetooth Method -->
-        <div class="connection-method" onclick="selectConnectionMethod(this, 'bluetooth')">
-            <div class="method-title">🔵 Bluetooth</div>
-            <div class="method-desc">Wireless connection via Bluetooth</div>
-        </div>
-
-        <!-- Connection Details Section -->
-        <div id="connectionDetails" style="display:none;">
-            <div class="section-title" id="connectionTitle">WiFi Connection Details</div>
-
-            <div id="wifiDetails">
-                <div class="message">
-                    <p><strong>1. On your phone:</strong> Open ScrollCheck app</p>
-                    <p><strong>2. Go to Settings → Connect Device</strong></p>
-                    <p><strong>3. Enter this code:</strong></p>
-                </div>
-                <div class="connection-code" id="connectionCode">SC-2024-7891</div>
-                <button class="btn-connect" onclick="initiateMobileConnection()">[ Waiting for Phone... ]</button>
-            </div>
-
-            <div id="qrDetails" style="display:none;">
-                <div class="message">
-                    <p><strong>1. Open ScrollCheck app on your phone</strong></p>
-                    <p><strong>2. Tap "Scan Connection Code"</strong></p>
-                    <p><strong>3. Point your phone camera at this QR code</strong></p>
-                </div>
-                <div class="qr-code">
-                    <div class="qr-placeholder">📱</div>
-                    <p style="margin-top: 10px; font-size: 0.9em; color: #666;">Scan this code to connect</p>
-                </div>
-                <button class="btn-connect" onclick="initiateMobileConnection()">[ Waiting for Phone... ]</button>
-            </div>
-
-            <div id="usbDetails" style="display:none;">
-                <div class="device-connecting" id="usbStatus">
-                    ⏳ USB connection in progress...
-                </div>
-                <div class="message">
-                    <p><strong>1. Connect phone via USB cable to this computer</strong></p>
-                    <p><strong>2. On your phone, tap "Allow" for debugging</strong></p>
-                    <p><strong>3. ScrollCheck will auto-connect and sync data</strong></p>
-                </div>
-            </div>
-
-            <div id="bluetoothDetails" style="display:none;">
-                <div class="message">
-                    <p><strong>1. Enable Bluetooth on both devices</strong></p>
-                    <p><strong>2. Open ScrollCheck app on your phone</strong></p>
-                    <p><strong>3. Go to Settings → Bluetooth Devices</strong></p>
-                    <p><strong>4. Select this computer from the list</strong></p>
-                </div>
-                <button class="btn-connect" onclick="initiateMobileConnection()">[ Pair Now ]</button>
-            </div>
-        </div>
-
-        <div class="btn-row">
-            <button class="btn-analyze" onclick="goToConnection()">[ Skip for Now ]</button>
-            <button class="btn-back" onclick="goToWelcome()">← Back</button>
-        </div>
-    </div>
-
-    <!-- Connection Status Screen -->
-    <div class="container screen" id="connectionStatusScreen">
-        <h1>Device Connected! 🎉</h1>
-        <p class="tagline">Real-time screen time tracking active</p>
-
-        <div class="device-connected" id="deviceInfo">
-            ✓ iPhone connected • Last sync: Just now
-        </div>
-
-        <div class="section-title">📱 Real-Time Platform Data</div>
-        <div class="real-time-section" id="realtimeDeviceData">
-            <!-- Real device data will populate here -->
-        </div>
-
-        <div class="section-title">⚙️ Connection Settings</div>
-        <div class="toggle-tracking">
-            <span>Auto-sync data</span>
-            <label class="toggle-switch">
-                <input type="checkbox" checked>
-                <span class="toggle-slider"></span>
-            </label>
-        </div>
-
-        <div class="btn-row">
-            <button class="btn-analyze" onclick="goToConnection()">[ Continue ]</button>
-            <button class="btn-back" onclick="disconnectDevice()">[ Disconnect ]</button>
-        </div>
-    </div>
-
-    <!-- Connection Screen (Select Apps) -->
-    <div class="container screen" id="connectionScreen">
-        <h1>Connect Your Apps</h1>
-        <p class="tagline">Link your social media to track screen time</p>
-
-        <div class="message" id="deviceSyncMessage" style="display:none;">
-            <p>📱 Synced from your connected device</p>
-        </div>
-
-        <div class="social-grid">
-            <!-- Instagram -->
-            <div class="social-card" onclick="toggleConnection(this, 'instagram')">
-                <div class="checkmark">✓</div>
-                <div class="social-icon">📸</div>
-                <div class="social-name">Instagram</div>
-                <div class="social-status status-disconnected" id="status-instagram">Not Connected</div>
-            </div>
-
-            <!-- TikTok -->
-            <div class="social-card" onclick="toggleConnection(this, 'tiktok')">
-                <div class="checkmark">✓</div>
-                <div class="social-icon">🎵</div>
-                <div class="social-name">TikTok</div>
-                <div class="social-status status-disconnected" id="status-tiktok">Not Connected</div>
-            </div>
-
-            <!-- YouTube -->
-            <div class="social-card" onclick="toggleConnection(this, 'youtube')">
-                <div class="checkmark">✓</div>
-                <div class="social-icon">📺</div>
-                <div class="social-name">YouTube</div>
-                <div class="social-status status-disconnected" id="status-youtube">Not Connected</div>
-            </div>
-
-            <!-- Facebook -->
-            <div class="social-card" onclick="toggleConnection(this, 'facebook')">
-                <div class="checkmark">✓</div>
-                <div class="social-icon">👥</div>
-                <div class="social-name">Facebook</div>
-                <div class="social-status status-disconnected" id="status-facebook">Not Connected</div>
-            </div>
-
-            <!-- Twitter/X -->
-            <div class="social-card" onclick="toggleConnection(this, 'twitter')">
-                <div class="checkmark">✓</div>
-                <div class="social-icon">𝕏</div>
-                <div class="social-name">Twitter/X</div>
-                <div class="social-status status-disconnected" id="status-twitter">Not Connected</div>
-            </div>
-
-            <!-- LinkedIn -->
-            <div class="social-card" onclick="toggleConnection(this, 'linkedin')">
-                <div class="checkmark">✓</div>
-                <div class="social-icon">💼</div>
-                <div class="social-name">LinkedIn</div>
-                <div class="social-status status-disconnected" id="status-linkedin">Not Connected</div>
-            </div>
-
-            <!-- Snapchat -->
-            <div class="social-card" onclick="toggleConnection(this, 'snapchat')">
-                <div class="checkmark">✓</div>
-                <div class="social-icon">👻</div>
-                <div class="social-name">Snapchat</div>
-                <div class="social-status status-disconnected" id="status-snapchat">Not Connected</div>
-            </div>
-
-            <!-- Reddit -->
-            <div class="social-card" onclick="toggleConnection(this, 'reddit')">
-                <div class="checkmark">✓</div>
-                <div class="social-icon">🔴</div>
-                <div class="social-name">Reddit</div>
-                <div class="social-status status-disconnected" id="status-reddit">Not Connected</div>
-            </div>
-
-            <!-- Pinterest -->
-            <div class="social-card" onclick="toggleConnection(this, 'pinterest')">
-                <div class="checkmark">✓</div>
-                <div class="social-icon">📌</div>
-                <div class="social-name">Pinterest</div>
-                <div class="social-status status-disconnected" id="status-pinterest">Not Connected</div>
-            </div>
-
-            <!-- Telegram -->
-            <div class="social-card" onclick="toggleConnection(this, 'telegram')">
-                <div class="checkmark">✓</div>
-                <div class="social-icon">✈️</div>
-                <div class="social-name">Telegram</div>
-                <div class="social-status status-disconnected" id="status-telegram">Not Connected</div>
-            </div>
-
-            <!-- Discord -->
-            <div class="social-card" onclick="toggleConnection(this, 'discord')">
-                <div class="checkmark">✓</div>
-                <div class="social-icon">💬</div>
-                <div class="social-name">Discord</div>
-                <div class="social-status status-disconnected" id="status-discord">Not Connected</div>
-            </div>
-
-            <!-- Twitch -->
-            <div class="social-card" onclick="toggleConnection(this, 'twitch')">
-                <div class="checkmark">✓</div>
-                <div class="social-icon">🎮</div>
-                <div class="social-name">Twitch</div>
-                <div class="social-status status-disconnected" id="status-twitch">Not Connected</div>
-            </div>
-        </div>
-
-        <div class="btn-row">
-            <button class="btn-analyze" onclick="goToTracking()">[ Analyze ]</button>
-            <button class="btn-back" onclick="goToWelcome()">← Back</button>
-        </div>
-    </div>
-
-    <!-- Analysis Screen -->
-    <div class="container screen" id="analysisScreen">
-        <h1>Your Scroll Balance</h1>
-
-        <div class="device-connected" id="syncInfo" style="display:none;">
-            ✓ Data synced from your device
-        </div>
-
-        <div class="score-section">
-            <div class="score" id="scoreValue">72 / 100</div>
-            <div class="score-label" id="scoreStatus">🟡 Good Balance</div>
-        </div>
-
-        <div class="section-title">📱 Platform Usage (From Your Device)</div>
-        <div class="platform-stats" id="platformStats">
-            <!-- Dynamically generated -->
-        </div>
-
-        <div class="section-title">Your usage today</div>
-        <div class="breakdown">
-            <div class="breakdown-item">
-                <span class="breakdown-label">📚 Learning</span>
-                <span class="breakdown-value" id="educationalDisplay">25 min</span>
-            </div>
-            <div class="breakdown-item">
-                <span class="breakdown-label">🛠️ Useful</span>
-                <span class="breakdown-value" id="usefulDisplay">10 min</span>
-            </div>
-            <div class="breakdown-item">
-                <span class="breakdown-label">🎭 Entertainment</span>
-                <span class="breakdown-value" id="entertainmentDisplay">35 min</span>
-            </div>
-            <div class="breakdown-item">
-                <span class="breakdown-label">🔍 Unclassified</span>
-                <span class="breakdown-value" id="unclassifiedDisplay">4 min</span>
-            </div>
-            <div class="total-row">
-                <span>⏱️ Total</span>
-                <span id="totalDisplay">74 min</span>
-            </div>
-        </div>
-
-        <div class="message" id="feedbackMessage">
-            <p id="feedbackText">47% of your scrolling was educational or useful.</p>
-        </div>
-
-        <div class="btn-row">
-            <button class="btn-analyze" onclick="goToConnection()">[ Track Again ]</button>
-            <button class="btn-back" onclick="goToWelcome()">← Home</button>
-        </div>
-    </div>
-
-    <script>
-        // Connected platforms tracking
-        const connectedPlatforms = {};
-        const platformIcons = {
-            instagram: '📸',
-            tiktok: '🎵',
-            youtube: '📺',
-            facebook: '👥',
-            twitter: '𝕏',
-            linkedin: '💼',
-            snapchat: '👻',
-            reddit: '🔴',
-            pinterest: '📌',
-            telegram: '✈️',
-            discord: '💬',
-            twitch: '🎮'
-        };
-
-        // Device connection data
-        let deviceConnected = false;
-        let deviceData = {};
-        let selectedConnectionMethod = '';
-
-        function goToWelcome() {
-            switchScreen('welcomeScreen');
-        }
-
-        function goToMobileIntegration() {
-            switchScreen('mobileIntegrationScreen');
-        }
-
-        function goToConnection() {
-            if (deviceConnected) {
-                document.getElementById('deviceSyncMessage').style.display = 'block';
-            }
-            switchScreen('connectionScreen');
-        }
-
-        function goToTracking() {
-            switchScreen('analysisScreen');
-            analyzeDeviceData();
-        }
-
-        function switchScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            document.getElementById(screenId).classList.add('active');
-        }
-
-        function selectConnectionMethod(element, method) {
-            document.querySelectorAll('.connection-method').forEach(el => {
-                el.classList.remove('active');
-            });
-            element.classList.add('active');
-            selectedConnectionMethod = method;
-            
-            document.getElementById('connectionDetails').style.display = 'block';
-            document.getElementById('wifiDetails').style.display = 'none';
-            document.getElementById('qrDetails').style.display = 'none';
-            document.getElementById('usbDetails').style.display = 'none';
-            document.getElementById('bluetoothDetails').style.display = 'none';
-
-            if (method === 'wifi') {
-                document.getElementById('connectionTitle').textContent = '🌐 WiFi Connection';
-                document.getElementById('wifiDetails').style.display = 'block';
-            } else if (method === 'qr') {
-                document.getElementById('connectionTitle').textContent = '📷 QR Code Connection';
-                document.getElementById('qrDetails').style.display = 'block';
-            } else if (method === 'usb') {
-                document.getElementById('connectionTitle').textContent = '🔌 USB Connection';
-                document.getElementById('usbDetails').style.display = 'block';
-            } else if (method === 'bluetooth') {
-                document.getElementById('connectionTitle').textContent = '🔵 Bluetooth Connection';
-                document.getElementById('bluetoothDetails').style.display = 'block';
-            }
-        }
-
-        function initiateMobileConnection() {
-            // Simulate device connection
-            setTimeout(() => {
-                deviceConnected = true;
-                populateDeviceData();
-                switchScreen('connectionStatusScreen');
-            }, 2000);
-        }
-
-        function disconnectDevice() {
-            deviceConnected = false;
-            deviceData = {};
-            document.getElementById('deviceSyncMessage').style.display = 'none';
-            goToMobileIntegration();
-        }
-
-        function populateDeviceData() {
-            // Simulate real device data
-            const devices = ['iPhone 15', 'Samsung Galaxy S24', 'Google Pixel 8', 'OnePlus 12'];
-            const randomDevice = devices[Math.floor(Math.random() * devices.length)];
-            
-            document.getElementById('deviceInfo').innerHTML = `✓ ${randomDevice} connected • Last sync: Just now`;
-
-            // Generate mock device data
-            deviceData = {
-                instagram: { time: Math.floor(Math.random() * 120) + 10, reels: Math.floor(Math.random() * 50) + 5 },
-                tiktok: { time: Math.floor(Math.random() * 150) + 15, reels: Math.floor(Math.random() * 80) + 10 },
-                youtube: { time: Math.floor(Math.random() * 100) + 10, reels: Math.floor(Math.random() * 30) + 5 },
-                facebook: { time: Math.floor(Math.random() * 80) + 5, reels: Math.floor(Math.random() * 20) + 2 },
-                twitter: { time: Math.floor(Math.random() * 90) + 8, reels: Math.floor(Math.random() * 40) + 5 }
-            };
-
-            updateRealtimeDeviceDisplay();
-        }
-
-        function updateRealtimeDeviceDisplay() {
-            const container = document.getElementById('realtimeDeviceData');
-            let html = '';
-
-            Object.keys(deviceData).forEach(platform => {
-                const data = deviceData[platform];
-                html += `
-                    <div class="real-time-item">
-                        <span class="platform-name">${platformIcons[platform]} ${platform.charAt(0).toUpperCase() + platform.slice(1)}</span>
-                        <span><span class="live-time">LIVE</span> ${data.time} min • ${data.reels} reels</span>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- PAGE 1: WELCOME -->
+        <section class="page active" id="welcome">
+            <div class="welcome-container">
+                <div class="welcome-card">
+                    <h1 class="welcome-title">SCROLLCHECK</h1>
+                    <p class="welcome-subtitle">Understand your scrolling. Take control of your time.</p>
+                    <div class="welcome-icon">📱</div>
+                    <p class="welcome-text">
+                        ScrollCheck helps you understand how you spend your short-form video time. Not all screen time is equal. 
+                        Let's learn about your habits and make intentional choices.
+                    </p>
+                    <button class="btn-primary" onclick="showPage('daily-input')">Start Tracking</button>
+                    <div class="welcome-info">
+                        <p>💡 Track → Understand → Improve → Reward</p>
                     </div>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
-        function toggleConnection(element, platform) {
-            element.classList.toggle('connected');
-            connectedPlatforms[platform] = element.classList.contains('connected');
-            
-            const statusEl = document.getElementById(`status-${platform}`);
-            if (connectedPlatforms[platform]) {
-                statusEl.textContent = 'Connected';
-                statusEl.className = 'social-status status-connected';
-            } else {
-                statusEl.textContent = 'Not Connected';
-                statusEl.className = 'social-status status-disconnected';
-            }
-        }
-
-        function analyzeDeviceData() {
-            // Use device data for analysis
-            const platformData = {};
-            let totalPlatformTime = 0;
-            let totalReels = 0;
-
-            Object.keys(deviceData).forEach(platform => {
-                const data = deviceData[platform];
-                platformData[platform] = data;
-                totalPlatformTime += data.time;
-                totalReels += data.reels;
-            });
-
-            // Calculate score based on device data
-            const productiveRatio = Math.random() * 0.7 + 0.3; // 30-100%
-            let score = Math.round(productiveRatio * 100);
-            let status = '🟡 Good Balance';
-            let feedback = `🎬 You watched ${totalReels} reels/videos today. Spent ${totalPlatformTime} minutes on social media.`;
-
-            if (productiveRatio >= 0.6) {
-                status = '🟢 Excellent!';
-            } else if (productiveRatio < 0.4) {
-                status = '🔴 Needs Work';
-            }
-
-            document.getElementById('scoreValue').textContent = `${score} / 100`;
-            document.getElementById('scoreStatus').textContent = status;
-            document.getElementById('educationalDisplay').textContent = `${Math.floor(totalPlatformTime * 0.4)} min`;
-            document.getElementById('usefulDisplay').textContent = `${Math.floor(totalPlatformTime * 0.2)} min`;
-            document.getElementById('entertainmentDisplay').textContent = `${Math.floor(totalPlatformTime * 0.3)} min`;
-            document.getElementById('unclassifiedDisplay').textContent = `${Math.floor(totalPlatformTime * 0.1)} min`;
-            document.getElementById('totalDisplay').textContent = `${totalPlatformTime} min`;
-            document.getElementById('feedbackText').innerHTML = feedback;
-
-            const platformStatsHtml = Object.keys(platformData).map(platform => `
-                <div class="platform-stat-item">
-                    <span>${platformIcons[platform]} ${platform.charAt(0).toUpperCase() + platform.slice(1)}</span>
-                    <span>${platformData[platform].time} min • ${platformData[platform].reels} reels</span>
                 </div>
-            `).join('');
+            </div>
+        </section>
 
-            if (platformStatsHtml) {
-                document.getElementById('platformStats').innerHTML = `
-                    ${platformStatsHtml}
-                    <div class="platform-stat-item" style="font-weight: bold; background: #e8e8e8; padding: 10px; margin-top: 10px; border-radius: 5px;">
-                        <span>Total All Platforms</span>
-                        <span>${totalPlatformTime} min • ${totalReels} reels</span>
+        <!-- PAGE 2: DASHBOARD -->
+        <section class="page" id="dashboard">
+            <div class="page-header">
+                <h1>📊 Dashboard</h1>
+                <p>Your scrolling overview at a glance</p>
+            </div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3>Today's Total Time</h3>
+                    <div class="stat-value" id="dashTotalTime">0</div>
+                    <p class="stat-label">minutes</p>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Videos Watched</h3>
+                    <div class="stat-value" id="dashVideos">0</div>
+                    <p class="stat-label">short videos</p>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Educational Time</h3>
+                    <div class="stat-value" id="dashEducational">0</div>
+                    <p class="stat-label">minutes</p>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Entertainment Time</h3>
+                    <div class="stat-value" id="dashEntertainment">0</div>
+                    <p class="stat-label">minutes</p>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Scroll Balance</h3>
+                    <div class="stat-value" id="dashScore">0</div>
+                    <p class="stat-label">out of 100</p>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Current Streak</h3>
+                    <div class="stat-value" id="dashStreak">0</div>
+                    <p class="stat-label">days 🔥</p>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="showPage('daily-input')">Log Today's Activity</button>
+                <button class="btn-secondary" onclick="showPage('analysis')">View Full Analysis</button>
+            </div>
+        </section>
+
+        <!-- PAGE 3: DAILY INPUT -->
+        <section class="page" id="daily-input">
+            <div class="page-header">
+                <h1>📝 Log Your Activity</h1>
+                <p>Record your scrolling habits today</p>
+            </div>
+            <form class="input-form" id="dailyForm">
+                <div class="form-group">
+                    <label for="videos">📹 Short Videos Watched Today</label>
+                    <input type="number" id="videos" value="0" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="totalTime">⏱️ Total Scrolling Time</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="totalTime" value="0" min="0" required>
+                        <span class="unit">minutes</span>
                     </div>
-                `;
-            }
+                </div>
 
-            if (deviceConnected) {
-                document.getElementById('syncInfo').style.display = 'block';
-            }
-        }
-    </script>
+                <div class="form-section-title">📚 How did you spend your time?</div>
+
+                <div class="form-group">
+                    <label for="educational">🎓 Educational Content</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="educational" value="0" min="0" required>
+                        <span class="unit">min</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="useful">🛠️ Skill / Useful Content</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="useful" value="0" min="0" required>
+                        <span class="unit">min</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="entertainment">🎭 Entertainment</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="entertainment" value="0" min="0" required>
+                        <span class="unit">min</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="unclassified">❓ Unclassified</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="unclassified" value="0" min="0" required>
+                        <span class="unit">min</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="lateNight">🌙 Late-Night Scrolling (after 10 PM)</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="lateNight" value="0" min="0" required>
+                        <span class="unit">min</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary btn-large">Analyze My Usage</button>
+            </form>
+
+            <div class="form-info">
+                <p>✓ All values must be non-negative</p>
+                <p>✓ Your data is saved locally on your device</p>
+            </div>
+        </section>
+
+        <!-- PAGE 4: ANALYSIS -->
+        <section class="page" id="analysis">
+            <div class="page-header">
+                <h1>📈 Your Analysis</h1>
+                <p>Understanding your digital habits</p>
+            </div>
+
+            <!-- Scroll Balance Score -->
+            <div class="score-section">
+                <h2>Scroll Balance Score</h2>
+                <div class="score-display">
+                    <div class="score-circle">
+                        <div class="score-inner" id="scoreCircle">0</div>
+                        <div class="score-max">/100</div>
+                    </div>
+                    <div class="score-info">
+                        <h3 id="scoreCategory">N/A</h3>
+                        <p id="scoreFeedback">No data recorded yet. Start by logging your activity.</p>
+                    </div>
+                </div>
+                <div class="disclaimer">
+                    <strong>⚠️ Important:</strong> Scroll Balance Score is an educational behavioral indicator, not a medical diagnosis.
+                </div>
+            </div>
+
+            <!-- Content Breakdown -->
+            <div class="breakdown-section">
+                <h2>Content Breakdown</h2>
+                <div class="breakdown-grid">
+                    <div class="breakdown-card">
+                        <h3>🎓 Educational</h3>
+                        <div class="breakdown-time" id="breakdownEducational">0 min</div>
+                        <div class="breakdown-percent" id="breakdownEducationalPercent">0%</div>
+                    </div>
+                    <div class="breakdown-card">
+                        <h3>🛠️ Useful</h3>
+                        <div class="breakdown-time" id="breakdownUseful">0 min</div>
+                        <div class="breakdown-percent" id="breakdownUsefulPercent">0%</div>
+                    </div>
+                    <div class="breakdown-card">
+                        <h3>🎭 Entertainment</h3>
+                        <div class="breakdown-time" id="breakdownEntertainment">0 min</div>
+                        <div class="breakdown-percent" id="breakdownEntertainmentPercent">0%</div>
+                    </div>
+                    <div class="breakdown-card">
+                        <h3>❓ Unclassified</h3>
+                        <div class="breakdown-time" id="breakdownUnclassified">0 min</div>
+                        <div class="breakdown-percent" id="breakdownUnclassifiedPercent">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stats-section">
+                <h2>Today's Statistics</h2>
+                <div class="stats-table">
+                    <div class="stat-row">
+                        <span>Total Scrolling Time</span>
+                        <span id="statTotal">0 min</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Short Videos Watched</span>
+                        <span id="statVideos">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Educational + Useful</span>
+                        <span id="statProductive">0 min (0%)</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Late-Night Scrolling</span>
+                        <span id="statLateNight">0 min</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="showPage('daily-input')">Update Activity</button>
+                <button class="btn-secondary" onclick="showPage('weekly')">View Weekly Report</button>
+            </div>
+        </section>
+
+        <!-- PAGE 5: WEEKLY REPORT -->
+        <section class="page" id="weekly">
+            <div class="page-header">
+                <h1>📅 Weekly Report</h1>
+                <p>Your scrolling patterns throughout the week</p>
+            </div>
+
+            <div class="weekly-summary">
+                <div class="summary-card">
+                    <h3>Weekly Average</h3>
+                    <div class="summary-value" id="weeklyAverage">0</div>
+                    <p>minutes per day</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Highest Day</h3>
+                    <div class="summary-value" id="highestDay">-</div>
+                    <p id="highestDayTime">0 minutes</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Lowest Day</h3>
+                    <div class="summary-value" id="lowestDay">-</div>
+                    <p id="lowestDayTime">0 minutes</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Week Total</h3>
+                    <div class="summary-value" id="weekTotal">0</div>
+                    <p>minutes</p>
+                </div>
+            </div>
+
+            <div class="weekly-chart">
+                <h2>Daily Usage This Week</h2>
+                <div class="chart-bars">
+                    <div class="chart-bar-container">
+                        <div class="chart-bar" id="chartMon" style="height: 0%"></div>
+                        <span>Mon</span>
+                    </div>
+                    <div class="chart-bar-container">
+                        <div class="chart-bar" id="chartTue" style="height: 0%"></div>
+                        <span>Tue</span>
+                    </div>
+                    <div class="chart-bar-container">
+                        <div class="chart-bar" id="chartWed" style="height: 0%"></div>
+                        <span>Wed</span>
+                    </div>
+                    <div class="chart-bar-container">
+                        <div class="chart-bar" id="chartThu" style="height: 0%"></div>
+                        <span>Thu</span>
+                    </div>
+                    <div class="chart-bar-container">
+                        <div class="chart-bar" id="chartFri" style="height: 0%"></div>
+                        <span>Fri</span>
+                    </div>
+                    <div class="chart-bar-container">
+                        <div class="chart-bar" id="chartSat" style="height: 0%"></div>
+                        <span>Sat</span>
+                    </div>
+                    <div class="chart-bar-container">
+                        <div class="chart-bar" id="chartSun" style="height: 0%"></div>
+                        <span>Sun</span>
+                    </div>
+                </div>
+                <div class="chart-info">
+                    <p>Compared to last week: <span id="weeklyChange">N/A</span></p>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-secondary" onclick="showPage('analysis')">Back to Analysis</button>
+            </div>
+        </section>
+
+        <!-- PAGE 6: DAILY CHALLENGES -->
+        <section class="page" id="challenges">
+            <div class="page-header">
+                <h1>🎯 Daily Challenges</h1>
+                <p>Complete challenges and build better digital habits</p>
+            </div>
+
+            <div class="challenges-container">
+                <div class="challenge-card">
+                    <div class="challenge-header">
+                        <h3>Reduce Entertainment by 10%</h3>
+                        <span class="challenge-reward">+50 pts</span>
+                    </div>
+                    <p>Watch 10% less entertainment content than yesterday</p>
+                    <div class="challenge-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="challenge1Progress" style="width: 0%"></div>
+                        </div>
+                        <span id="challenge1Text">0/10% reduction</span>
+                    </div>
+                    <button class="btn-challenge" id="challenge1Btn" onclick="updateChallenge(1)">Track Progress</button>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-header">
+                        <h3>No Videos During Meals</h3>
+                        <span class="challenge-reward">+75 pts</span>
+                    </div>
+                    <p>Enjoy at least 3 meals without scrolling today</p>
+                    <div class="challenge-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="challenge2Progress" style="width: 0%"></div>
+                        </div>
+                        <span id="challenge2Text">0/3 meals completed</span>
+                    </div>
+                    <button class="btn-challenge" id="challenge2Btn" onclick="updateChallenge(2)">Log Meal</button>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-header">
+                        <h3>30-Minute Phone-Free Study</h3>
+                        <span class="challenge-reward">+100 pts</span>
+                    </div>
+                    <p>Complete a 30-minute focused study session without your phone</p>
+                    <div class="challenge-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="challenge3Progress" style="width: 0%"></div>
+                        </div>
+                        <span id="challenge3Text">0 min / 30 min</span>
+                    </div>
+                    <button class="btn-challenge" id="challenge3Btn" onclick="updateChallenge(3)">Start Session</button>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-header">
+                        <h3>Avoid Late-Night Scrolling</h3>
+                        <span class="challenge-reward">+75 pts</span>
+                    </div>
+                    <p>No scrolling after 10 PM today</p>
+                    <div class="challenge-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="challenge4Progress" style="width: 0%"></div>
+                        </div>
+                        <span id="challenge4Text">⏳ In progress...</span>
+                    </div>
+                    <button class="btn-challenge" id="challenge4Btn" onclick="updateChallenge(4)">Mark Complete</button>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-header">
+                        <h3>Take 3 Intentional Breaks</h3>
+                        <span class="challenge-reward">+60 pts</span>
+                    </div>
+                    <p>Use the 5-minute reset feature 3 times today</p>
+                    <div class="challenge-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="challenge5Progress" style="width: 0%"></div>
+                        </div>
+                        <span id="challenge5Text">0/3 breaks completed</span>
+                    </div>
+                    <button class="btn-challenge" id="challenge5Btn" onclick="showPage('break-timer')">Start Break</button>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-secondary" onclick="showPage('dashboard')">Back to Dashboard</button>
+            </div>
+        </section>
+
+        <!-- PAGE 7: REWARDS & POINTS -->
+        <section class="page" id="rewards">
+            <div class="page-header">
+                <h1>🏆 ScrollPoints & Rewards</h1>
+                <p>Earn points for building better habits</p>
+            </div>
+
+            <!-- Current Points -->
+            <div class="points-section">
+                <div class="points-card">
+                    <h2>Your ScrollPoints</h2>
+                    <div class="points-display" id="totalPoints">0</div>
+                    <p>Current Balance</p>
+                </div>
+
+                <div class="level-card">
+                    <h2 id="currentLevel">Beginner</h2>
+                    <div class="level-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="levelProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <p id="levelInfo">0 / 100 points to next level</p>
+                </div>
+            </div>
+
+            <!-- Rewards Table -->
+            <div class="rewards-section">
+                <h2>How to Earn Points</h2>
+                <div class="rewards-table">
+                    <div class="reward-row">
+                        <span>📊 Complete daily goal</span>
+                        <span class="reward-points">+30 pts</span>
+                    </div>
+                    <div class="reward-row">
+                        <span>⏱️ Complete 5-minute break</span>
+                        <span class="reward-points">+15 pts</span>
+                    </div>
+                    <div class="reward-row">
+                        <span>📉 Reduce entertainment by 10%</span>
+                        <span class="reward-points">+50 pts</span>
+                    </div>
+                    <div class="reward-row">
+                        <span>🌙 Avoid late-night scrolling</span>
+                        <span class="reward-points">+25 pts</span>
+                    </div>
+                    <div class="reward-row">
+                        <span>🔥 7-day streak achievement</span>
+                        <span class="reward-points">+100 pts</span>
+                    </div>
+                    <div class="reward-row">
+                        <span>🎉 Complete weekly challenge</span>
+                        <span class="reward-points">+150 pts</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Levels & Badges -->
+            <div class="levels-section">
+                <h2>Achievement Levels</h2>
+                <div class="levels-grid">
+                    <div class="level-badge" id="level1">
+                        <div class="badge-icon">🌱</div>
+                        <h3>Beginner</h3>
+                        <p>0–100 points</p>
+                        <p class="badge-unlock">First step!</p>
+                    </div>
+                    <div class="level-badge" id="level2">
+                        <div class="badge-icon">📚</div>
+                        <h3>Focus Builder</h3>
+                        <p>100–300 points</p>
+                        <p class="badge-unlock">Building momentum</p>
+                    </div>
+                    <div class="level-badge" id="level3">
+                        <div class="badge-icon">⚖️</div>
+                        <h3>Digital Balance</h3>
+                        <p>300–700 points</p>
+                        <p class="badge-unlock">Balanced habits</p>
+                    </div>
+                    <div class="level-badge" id="level4">
+                        <div class="badge-icon">🏅</div>
+                        <h3>Focus Champion</h3>
+                        <p>700+ points</p>
+                        <p class="badge-unlock">Master of control</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-secondary" onclick="showPage('dashboard')">Back to Dashboard</button>
+            </div>
+        </section>
+
+        <!-- PAGE 8: STREAK -->
+        <section class="page" id="streak">
+            <div class="page-header">
+                <h1>🔥 Don't Break the Chain</h1>
+                <p>Your focus streaks and milestones</p>
+            </div>
+
+            <div class="streak-section">
+                <div class="streak-card main-streak">
+                    <div class="streak-icon">🔥</div>
+                    <h2>Current Streak</h2>
+                    <div class="streak-number" id="currentStreakDisplay">0</div>
+                    <p>consecutive days</p>
+                </div>
+
+                <div class="streak-card best-streak">
+                    <div class="streak-icon">🏆</div>
+                    <h2>Best Streak</h2>
+                    <div class="streak-number" id="bestStreakDisplay">0</div>
+                    <p>consecutive days</p>
+                </div>
+            </div>
+
+            <div class="streak-progress">
+                <h2>Streak Milestones</h2>
+                <div class="milestones">
+                    <div class="milestone" id="milestone7">
+                        <div class="milestone-icon">📅</div>
+                        <div class="milestone-info">
+                            <p>7-Day Streak</p>
+                            <span class="milestone-reward">+100 points</span>
+                        </div>
+                        <div class="milestone-status" id="milestone7Status">Locked</div>
+                    </div>
+                    <div class="milestone" id="milestone14">
+                        <div class="milestone-icon">📅</div>
+                        <div class="milestone-info">
+                            <p>14-Day Streak</p>
+                            <span class="milestone-reward">+200 points</span>
+                        </div>
+                        <div class="milestone-status" id="milestone14Status">Locked</div>
+                    </div>
+                    <div class="milestone" id="milestone30">
+                        <div class="milestone-icon">📅</div>
+                        <div class="milestone-info">
+                            <p>30-Day Streak</p>
+                            <span class="milestone-reward">+500 points</span>
+                        </div>
+                        <div class="milestone-status" id="milestone30Status">Locked</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="streak-info">
+                <p>💡 Tip: A streak is earned when you complete your daily goals. Miss a day and your streak resets!</p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-secondary" onclick="showPage('dashboard')">Back to Dashboard</button>
+            </div>
+        </section>
+
+        <!-- PAGE 9: BREAK TIMER -->
+        <section class="page" id="break-timer">
+            <div class="page-header">
+                <h1>⏱️ 5-Minute Reset</h1>
+                <p>Take a break and recharge</p>
+            </div>
+
+            <div class="timer-section">
+                <div class="timer-display" id="timerDisplay">05:00</div>
+                <p class="timer-label">Time to reset</p>
+
+                <div class="timer-buttons">
+                    <button class="btn-primary" id="timerStart" onclick="startTimer()">START</button>
+                    <button class="btn-secondary" id="timerPause" onclick="pauseTimer()" style="display: none;">PAUSE</button>
+                    <button class="btn-reset" id="timerReset" onclick="resetTimer()">RESET</button>
+                </div>
+
+                <div class="timer-message" id="timerMessage" style="display: none;">
+                    <h2>✅ Break Complete!</h2>
+                    <p>Great job taking care of yourself. You earned +15 ScrollPoints!</p>
+                    <button class="btn-primary" onclick="completeBreak()">Claim Points</button>
+                </div>
+            </div>
+
+            <div class="break-activities">
+                <h2>💡 Suggested Activities During Your Break:</h2>
+                <div class="activities-grid">
+                    <div class="activity">
+                        <div class="activity-icon">👀</div>
+                        <p>Look away from the screen</p>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-icon">🧘</div>
+                        <p>Stretch your body</p>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-icon">💧</div>
+                        <p>Drink water</p>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-icon">🚶</div>
+                        <p>Take a short walk</p>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-icon">🌬️</div>
+                        <p>Deep breathing exercise</p>
+                    </div>
+                    <div class="activity">
+                        <div class="activity-icon">✨</div>
+                        <p>Mindfulness moment</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-secondary" onclick="showPage('dashboard')">Back to Dashboard</button>
+            </div>
+        </section>
+
+        <!-- PAGE 10: FUTURE FEATURES -->
+        <section class="page" id="future">
+            <div class="page-header">
+                <h1>🚀 Coming Soon</h1>
+                <p>Exciting features in development</p>
+            </div>
+
+            <div class="future-features">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h2>AI Content Classification</h2>
+                    <p>
+                        In a future version, ScrollCheck could estimate whether short-form content is educational, 
+                        useful, entertainment, or unclassified using video metadata, transcripts, and AI analysis.
+                    </p>
+                    <p class="feature-status">Coming soon</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h2>Device Integration</h2>
+                    <p>
+                        Future versions may connect to supported device usage data to automatically track your 
+                        scrolling time and reduce manual entry.
+                    </p>
+                    <p class="feature-status">Coming soon</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h2>Social Features</h2>
+                    <p>
+                        Share your progress with friends, join group challenges, and support each other 
+                        in building healthier digital habits.
+                    </p>
+                    <p class="feature-status">In planning</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔔</div>
+                    <h2>Smart Notifications</h2>
+                    <p>
+                        Get personalized reminders and insights based on your patterns to help you make 
+                        intentional choices about screen time.
+                    </p>
+                    <p class="feature-status">In development</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">☁️</div>
+                    <h2>Cloud Sync</h2>
+                    <p>
+                        Securely sync your data across devices. Your privacy is important – data is encrypted 
+                        and only you have access to it.
+                    </p>
+                    <p class="feature-status">Coming soon</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h2>Advanced Analytics</h2>
+                    <p>
+                        Deeper insights into your scrolling patterns, trends over time, and personalized 
+                        recommendations to help you achieve your goals.
+                    </p>
+                    <p class="feature-status">In development</p>
+                </div>
+            </div>
+
+            <div class="future-info">
+                <div class="info-box">
+                    <h3>🔒 Privacy First</h3>
+                    <p>
+                        All future features will maintain our commitment to your privacy. ScrollCheck does not 
+                        and will not sell your data.
+                    </p>
+                </div>
+                <div class="info-box">
+                    <h3>📢 Feedback Welcome</h3>
+                    <p>
+                        Have a feature idea? We'd love to hear it! ScrollCheck is built for students, by students.
+                    </p>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-secondary" onclick="showPage('dashboard')">Back to Dashboard</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
 </body>
 </html>
